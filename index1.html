@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINROCKET | Heavy Duty</title>
+    <style>
+        /* --- Шрифты и Сброс --- */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: #e0e0d9;
+            color: #111;
+            overflow-x: hidden;
+        }
+
+        /* --- Шум --- */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.35;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+            animation: noiseAnim 0.2s infinite; /* Анимация самого шума */
+        }
+
+        @keyframes noiseAnim {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-1%, -1%); }
+            20% { transform: translate(1%, 1%); }
+            30% { transform: translate(-1%, 1%); }
+            40% { transform: translate(1%, -1%); }
+            50% { transform: translate(-1%, 0); }
+            60% { transform: translate(1%, 0); }
+            70% { transform: translate(0, 1%); }
+            80% { transform: translate(0, -1%); }
+            90% { transform: translate(1%, 1%); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* --- Курсор --- */
+        .cursor { width: 20px; height: 20px; border: 2px solid #000; border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; mix-blend-mode: difference; transition: transform 0.1s; }
+        .cursor-follower { width: 8px; height: 8px; background-color: #4a5; border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; }
+
+        /* --- Секции --- */
+        section {
+            min-height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- 1. Герой --- */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at 50% 50%, #f0f0e8, #e0e0d9);
+        }
+
+        h1 {
+            font-size: 10vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -5px;
+            color: #fff;
+            text-shadow: 3px 3px 0px #000;
+            background: #000;
+            padding: 0 20px;
+            mix-blend-mode: multiply;
+            position: relative;
+        }
+
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #e0e0d9;
+        }
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+            animation: glitch-top 2s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+            animation: glitch-bottom 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-top {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+            100% { transform: translate(0); }
+        }
+        @keyframes glitch-bottom {
+            0% { transform: translate(0); }
+            20% { transform: translate(3px, -3px); }
+            40% { transform: translate(3px, 3px); }
+            60% { transform: translate(-3px, -3px); }
+            80% { transform: translate(-3px, 3px); }
+            100% { transform: translate(0); }
+        }
+
+        .sub-header {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #000;
+            background: #4a5;
+            padding: 5px 15px;
+            transform: rotate(-2deg);
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.2);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: rotate(-2deg) translateY(0px); }
+            50% { transform: rotate(-2deg) translateY(-10px); }
+            100% { transform: rotate(-2deg) translateY(0px); }
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            color: #000;
+            animation: bounce 2s infinite;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+
+        /* --- 2. Навыки (Tech Stack) --- */
+        .tech-section {
+            background: #111;
+            color: #fff;
+            padding: 100px 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            color: #666;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .tech-item {
+            border: 1px solid #333;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .tech-item:hover {
+            border-color: #4a5;
+        }
+
+        .decode-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            height: 2.5rem; /* Фиксируем высоту, чтобы не прыгало */
+        }
+
+        .tech-desc {
+            margin-top: 15px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        /* --- 3. Мониторинг (Dashboard) --- */
+        .monitoring-section {
+            background: #e0e0d9;
+            padding: 100px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 50px;
+        }
+
+        /* Круги мониторинга */
+        .rings-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            flex-shrink: 0;
+        }
+
+        .ring {
+            position: absolute;
+            border: 2px solid #000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ring-1 { width: 100%; height: 100%; animation: spin 10s linear infinite; border-style: dashed; }
+        .ring-2 { width: 70%; height: 70%; top: 15%; left: 15%; animation: spin-rev 8s linear infinite; border-width: 4px; }
+        .ring-3 { width: 40%; height: 40%; top: 30%; left: 30%; background: #4a5; border: none; box-shadow: 0 0 50px rgba(74, 170, 85, 0.3); }
+
+        .center-data {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #000;
+            text-align: center;
+            z-index: 2;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-rev { 100% { transform: rotate(-360deg); } }
+
+        /* Терминал */
+        .terminal {
+            flex-grow: 1;
+            min-width: 300px;
+            background: #000;
+            color: #4a5;
+            padding: 20px;
+            box-shadow: 20px 20px 0px rgba(0,0,0,0.2);
+            font-size: 0.9rem;
+            height: 300px;
+            overflow: hidden;
+            border: 2px solid #000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            color: #fff;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #ff5f56; }
+        .dot:nth-child(2) { background: #ffbd2e; }
+        .dot:nth-child(3) { background: #27c93f; }
+
+        #log-output {
+            white-space: pre-wrap;
+            flex-grow: 1;
+        }
+
+        /* --- 4. Статистика и Контакты --- */
+        .stats-section {
+            background: #111;
+            color: #fff;
+            padding: 100px 10%;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            flex-wrap: wrap;
+            margin-bottom: 80px;
+        }
+
+        .stat-item h2 {
+            font-size: 4rem;
+            color: #4a5;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .stat-item p {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #888;
+        }
+
+        .contact-box {
+            border: 2px solid #4a5;
+            padding: 50px;
+            display: inline-block;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .contact-box h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-main {
+            background: #4a5;
+            color: #000;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+            border: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            display: inline-block;
+        }
+
+        .btn-main:hover {
+            background: #fff;
+            box-shadow: 0 0 20px #fff;
+            transform: translate(5px, 5px);
+        }
+
+        /* --- Адаптив --- */
+        @media (max-width: 768px) {
+            h1 { font-size: 4rem; }
+            .monitoring-section { flex-direction: column; }
+            .terminal { width: 100%; height: 200px; }
+            .rings-container { width: 250px; height: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise-overlay"></div>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="follower"></div>
+
+    <!-- 1. Hero -->
+    <section class="hero">
+        <h1 class="glitch" data-text="MINROCKET">MINROCKET</h1>
+        <div class="sub-header">ADMINISTRATOR // DEVOPS // ENGINEER</div>
+        <div class="scroll-hint">SCROLL DOWN</div>
+    </section>
+
+    <!-- 2. Tech Stack -->
+    <section class="tech-section">
+        <div class="section-title">TECHNOLOGY STACK</div>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <div class="decode-text" id="decode-1"></div>
+                <p class="tech-desc">Ядро, драйверы, права доступа. Лечу панику ядра улыбкой.</p>
+            </div>
+            <div class="tech-item">
+                <div class="decode-text" id="decode-2"></div>
+                <p class="tech-desc">AWS, Azure, DigitalOcean. Облака — это просто чужой Linux.</p>
+            </div>
+            <div class="tech-item">
+                <div class="decode-text" id="decode-3"></div>
+                <p class="tech-desc">Контейнеризация всего, что движется. Kubernetes привет.</p>
+            </div>
+            <div class="tech-item">
+                <div class="decode-text" id="decode-4"></div>
+                <p class="tech-desc">Bash, Python, PowerShell. Автоматизирую боль в удовольствие.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Monitoring -->
+    <section class="monitoring-section">
+        <div class="rings-container">
+            <div class="ring ring-1">
+                <span style="position: absolute; top: 0; font-size: 0.8rem;">UPTIME: 99.9%</span>
+                <span style="position: absolute; bottom: 0; font-size: 0.8rem;">LATENCY: 12ms</span>
+            </div>
+            <div class="ring ring-2">
+                <span style="position: absolute; top: 0; font-size: 0.8rem;">SECURE</span>
+                <span style="position: absolute; bottom: 0; font-size: 0.8rem;">ACTIVE</span>
+            </div>
+            <div class="ring ring-3">
+                <div class="center-data">
+                    ONLINE<br>24/7
+                </div>
+            </div>
+        </div>
+
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                <span style="margin-left: 10px; color: #555;">user@server:~</span>
+            </div>
+            <div id="log-output"></div>
+        </div>
+    </section>
+
+    <!-- 4. Stats & Footer -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h2 id="stat-servers">0</h2>
+                <p>Servers Managed</p>
+            </div>
+            <div class="stat-item">
+                <h2 id="stat-coffee">0</h2>
+                <p>Cups of Coffee</p>
+            </div>
+            <div class="stat-item">
+                <h2 id="stat-uptime">0</h2>
+                <p>Uptime Hours</p>
+            </div>
+        </div>
+
+        <div class="contact-box">
+            <h3>Готов к запуску проекта?</h3>
+            <p style="margin-bottom: 20px; color: #aaa;">Напиши мне, сервер уже греется.</p>
+            <a href="mailto:admin@yoursite.com" class="btn-main">Связаться сейчас</a>
+        </div>
+    </section>
+
+    <script>
+        // --- 1. Курсор ---
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('follower');
+        let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0, followerX = 0, followerY = 0;
+
+        document.addEventListener('mousemove', e => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX);
+            cursorY += (mouseY - cursorY);
+            followerX += (mouseX - followerX) * 0.12;
+            followerY += (mouseY - followerY) * 0.12;
+            cursor.style.left = cursorX - 10 + 'px';
+            cursor.style.top = cursorY - 10 + 'px';
+            follower.style.left = followerX - 4 + 'px';
+            follower.style.top = followerY - 4 + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // --- 2. Декодер текста (Запускается сразу!) ---
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&";
+        
+        function decodeText(elementId, finalText) {
+            const element = document.getElementById(elementId);
+            let iterations = 0;
+            
+            const interval = setInterval(() => {
+                // Формируем строку: уже угаданные буквы + рандомные
+                element.innerText = finalText.substring(0, iterations) + 
+                finalText.substring(iterations).split('').map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
+                
+                if(iterations >= finalText.length) {
+                    clearInterval(interval);
+                    element.innerText = finalText; // Убеждаемся, что финальный текст верный
+                }
+                iterations += 1/2; // Скорость декодирования
+            }, 40);
+        }
+
+        // Запускаем декодирование для всех блоков с задержкой
+        setTimeout(() => decodeText("decode-1", "LINUX"), 500);
+        setTimeout(() => decodeText("decode-2", "CLOUDS"), 1000);
+        setTimeout(() => decodeText("decode-3", "DOCKER"), 1500);
+        setTimeout(() => decodeText("decode-4", "SCRIPTS"), 2000);
+
+        // --- 3. Терминал (Логи) ---
+        const logOutput = document.getElementById('log-output');
+        const logs = [
+            "[OK] Starting network service...",
+            "[OK] Established secure SSH connection.",
+            "[INFO] Checking for updates... 0 updated, 0 new.",
+            "[WARN] High CPU load detected on Node-1.",
+            "[OK] Deploying container: web_app_v2.",
+            "[INFO] Backup created successfully: backup_04_11.tar.gz",
+            "[OK] Firewall rules updated. Port 22 open.",
+            "[INFO] User 'admin' logged in from 192.168.1.5",
+            "[OK] System health check: PASSED."
+        ];
+        let logIndex = 0;
+
+        setInterval(() => {
+            const line = document.createElement('div');
+            line.style.marginBottom = '5px';
+            line.style.opacity = '0';
+            line.innerText = `> ${logs[logIndex]}`;
+            logOutput.appendChild(line);
+            
+            // Анимация появления
+            setTimeout(() => { line.style.opacity = '1'; line.style.transition = 'opacity 0.5s'; }, 10);
+            
+            logIndex = (logIndex + 1) % logs.length;
+            
+            // Удаление старых строк, чтобы не переполнить
+            if (logOutput.childNodes.length > 10) {
+                logOutput.removeChild(logOutput.childNodes[0]);
+            }
+        }, 1500); // Логи появляются каждые 1.5 секунды
+
+        // --- 4. Счетчики статистики ---
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Запускаем счетчики, когда блок становится виден
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateValue("stat-servers", 0, 50, 2000);
+                    animateValue("stat-coffee", 0, 999, 2500);
+                    animateValue("stat-uptime", 0, 8760, 3000);
+                    statsObserver.disconnect(); // Считаем только один раз
+                }
+            });
+        }, { threshold: 0.5 });
+
+        statsObserver.observe(document.querySelector('.stats-grid'));
+
+    </script>
+</body>
+</html>
